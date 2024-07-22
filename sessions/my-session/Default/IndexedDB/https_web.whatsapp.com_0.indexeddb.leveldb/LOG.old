@@ -1,0 +1,24 @@
+2024/07/22-00:13:00.226 3678 Reusing MANIFEST C:\Users\rhzun\Desktop\venom\sessions\my-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2024/07/22-00:13:00.226 3678 Recovering log #72
+2024/07/22-00:13:00.231 3678 Reusing old log C:\Users\rhzun\Desktop\venom\sessions\my-session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000072.log 
+2024/07/22-00:13:01.698 217c Level-0 table #78: started
+2024/07/22-00:13:01.702 217c Level-0 table #78: 185262 bytes OK
+2024/07/22-00:13:01.705 217c Delete type=0 #72
+2024/07/22-00:13:01.705 3678 Manual compaction at level-0 from '\x00\x1f\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00 \x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/07/22-00:13:01.706 217c Level-0 table #80: started
+2024/07/22-00:13:01.708 217c Level-0 table #80: 446 bytes OK
+2024/07/22-00:13:01.709 217c Delete type=0 #77
+2024/07/22-00:13:01.710 3678 Manual compaction at level-0 from '\x00 \x00\x00\x00' @ 72057594037927935 : 1 .. '\x00!\x00\x00\x00' @ 0 : 0; will stop at '\x00 \x00\x00\x05' @ 201065 : 0
+2024/07/22-00:13:01.710 3678 Compacting 1@0 + 1@1 files
+2024/07/22-00:13:01.715 3678 Generated table #81@0: 4655 keys, 100175 bytes
+2024/07/22-00:13:01.715 3678 Compacted 1@0 + 1@1 files => 100175 bytes
+2024/07/22-00:13:01.716 3678 compacted to: files[ 0 1 1 0 0 0 0 ]
+2024/07/22-00:13:01.717 3678 Delete type=2 #80
+2024/07/22-00:13:01.717 3ee8 Manual compaction at level-0 from '\x00 \x00\x00\x05' @ 201065 : 0 .. '\x00!\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/07/22-00:13:02.752 3760 Compacting 1@1 + 1@2 files
+2024/07/22-00:13:02.802 3760 Generated table #82@1: 50594 keys, 1926887 bytes
+2024/07/22-00:13:02.802 3760 Compacted 1@1 + 1@2 files => 1926887 bytes
+2024/07/22-00:13:02.804 3760 compacted to: files[ 0 0 1 0 0 0 0 ]
+2024/07/22-00:13:02.804 3760 Delete type=2 #75
+2024/07/22-00:13:02.804 3760 Delete type=2 #78
+2024/07/22-00:13:02.804 3760 Delete type=2 #81
