@@ -5,6 +5,10 @@ const path = require('path');
 venom.create({
   session: 'my-session', // Nome da sessão
   folderNameToken: path.join(__dirname, 'sessions'), // Caminho para armazenar a sessão
+  headless: true, // Deve ser true para rodar sem interface gráfica
+  qrTimeout: 0, // Tempo infinito para exibir o QR code
+  authTimeout: 60, // Tempo limite para autenticação (em segundos)
+  autoClose: 0 // Não fechar a sessão automaticamente
 }).then((client) => start(client));
 
 function start(client) {
@@ -20,7 +24,7 @@ function start(client) {
 
       if (imei || serial) {
         // Mensagem de confirmação
-        client.sendText(message.from, '🔍 Sua consulta está sendo processada. Aguarde um momento enquanto buscamos as informações...');
+        client.sendText(message.from, '🔍 *Sua consulta está sendo processada.*\nPor favor, aguarde um momento enquanto buscamos as informações...');
 
         const myCheck = {
           service: 120,
@@ -47,48 +51,99 @@ function start(client) {
           const myResult = response.data;
 
           if (myResult.success === undefined) {
-            client.sendText(message.from, '❌ Erro: Resposta inesperada da API.');
+            client.sendText(message.from, '❌ *Erro:* Resposta inesperada da API.');
             return;
           }
 
           if (!myResult.success) {
-            client.sendText(message.from, `❌ Erro: ${myResult.response || 'Erro desconhecido'}`);
+            client.sendText(message.from, `❌ *Erro:* ${myResult.response || 'Erro desconhecido'}`);
           } else {
             const object = myResult.object;
 
-            let reply = '*✅ CHECK NEW SUPPORT ✅*\n';
-            reply += `📱 *Descrição do Modelo:* ${object.modelDescription}\n`;
-            reply += `📱 *Modelo:* ${object.model}\n`;
-            reply += '====================\n';
+            let reply = '✅ *NEW SUPPORT CHECK* ✅\n';
+            reply += '--------------------------\n';
+            reply += `📱 *Model Description:* ${object.modelDescription}\n`;
+            reply += `📱 *Model:* ${object.model}\n`;
+            reply += '--------------------------\n';
             if (object.imei) reply += `🔍 *IMEI:* ${object.imei}\n`;
-            if (object.serial) reply += `🔢 *Número de Série:* ${object.serial}\n`;
-            reply += `🛠️ *Status da Garantia:* ${object.warrantyStatus}\n`;
-            reply += `📅 *Data Estimada de Compra:* ${object.estimatedPurchaseDate}\n`;
+            if (object.serial) reply += `🔢 *Serial Number:* ${object.serial}\n`;
+            reply += `🛠️ *Warranty Status:* ${object.warrantyStatus}\n`;
+            reply += `📅 *Estimated Purchase Date:* ${object.estimatedPurchaseDate}\n`;
             reply += `🔒 *Find My iPhone:* ${object.fmiON ? 'ON ✅' : 'OFF ✅'}\n`;
-            reply += `🔒 *Status do iCloud:* ${object.fmiON ? (object.lostMode ? 'Perdido 🔴' : 'Limpo ✅') : 'N/A'}\n`;
-            reply += `📋 *Unidade de Demonstração:* ${object.demoUnit}\n`;
-            reply += `📋 *Dispositivo de Empréstimo:* ${object.loanerDevice}\n`;
-            reply += `🔄 *Dispositivo Substituído:* ${object.replacedDevice}\n`;
-            reply += `🔄 *Dispositivo de Substituição:* ${object.replacementDevice}\n`;
-            reply += `🛠️ *Dispositivo Reformado:* ${object.refurbishedDevice}\n`;
-            reply += `🔗 *Status na Lista Negra:* ${object.blacklistStatus}\n`;
-            reply += `🌍 *País de Compra:* ${object.purchaseCountry}\n`;
-            reply += `📶 *Operadora Possível:* ${object.possibleCarrier}\n`;
-            reply += `📶 *Operadora:* ${object.carrier}\n`;
-            reply += `🔓 *Status de Bloqueio SIM:* ${object['sim-lockStatus']}\n`;
-            reply += '====================\n';
-            reply += '*✅ CHECK NEW SUPPORT ✅*\n';
-            reply += '*Criador do Bot:* RhzUnlocker\n';
-            reply += '*Número de Contato:* +55 21 96874-1898\n';
+            reply += `🔒 *iCloud Status:* ${object.fmiON ? (object.lostMode ? 'Lost 🔴' : 'Clean ✅') : 'N/A'}\n`;
+            reply += `📋 *Demo Unit:* ${object.demoUnit}\n`;
+            reply += `📋 *Loaner Device:* ${object.loanerDevice}\n`;
+            reply += `🔄 *Replaced Device:* ${object.replacedDevice}\n`;
+            reply += `🔄 *Replacement Device:* ${object.replacementDevice}\n`;
+            reply += `🛠️ *Refurbished Device:* ${object.refurbishedDevice}\n`;
+            reply += `🔗 *Blacklist Status:* ${object.blacklistStatus}\n`;
+            reply += `🌍 *Purchase Country:* ${object.purchaseCountry}\n`;
+            reply += `📶 *Possible Carrier:* ${object.possibleCarrier}\n`;
+            reply += `📶 *Carrier:* ${object.carrier}\n`;
+            reply += `🔓 *SIM Lock Status:* ${object['sim-lockStatus']}\n`;
+            reply += '--------------------------\n';
+            reply += '*Bot Creator:* RhzUnlocker\n';
+            reply += '*Contact Number:* +55 21 96874-1898\n';
 
             client.sendText(message.from, reply);
           }
         } catch (error) {
-          console.error('Erro na solicitação:', error.message);
-          client.sendText(message.from, `❌ Erro HTTP: ${error.response ? error.response.status : 'Desconhecido'}\nMensagem: ${error.message}`);
+          console.error('Request error:', error.message);
+          client.sendText(message.from, `❌ *HTTP Error:* ${error.response ? error.response.status : 'Unknown'}\n*Message:* ${error.message}`);
         }
       } else {
-        client.sendText(message.from, '⚠️ Por favor, forneça um IMEI ou número de série válido.');
+        client.sendText(message.from, '⚠️ *Por favor, forneça um IMEI ou número de série válido.*');
+      }
+    } else if (message.isGroupMsg && message.body.startsWith('/status')) {
+      const params = message.body.split(' ');
+      const imei = params[1] ? params[1].trim() : null;
+
+      if (imei) {
+        // Mensagem de confirmação
+        client.sendText(message.from, '🔍 *Sua consulta de status está sendo processada.*\nPor favor, aguarde um momento...');
+
+        const myCheck = {
+          service: 60,
+          imei: imei,
+          key: 'H1M-ZI2-XLO-5AB-4PF-UDR-R84-TT9'
+        };
+
+        try {
+          // Enviar dados usando URLSearchParams
+          const response = await axios.post('https://api.ifreeicloud.co.uk', new URLSearchParams(myCheck).toString(), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          });
+
+          console.log('Status Code:', response.status);
+          console.log('Resposta Completa:', response.data);
+
+          const myResult = response.data;
+
+          if (myResult.success === undefined) {
+            client.sendText(message.from, '❌ *Erro:* Resposta inesperada da API.');
+            return;
+          }
+
+          if (!myResult.success) {
+            client.sendText(message.from, `❌ *Erro:* ${myResult.error || 'Erro desconhecido'}`);
+          } else {
+            const object = myResult.object;
+
+            let statusMessage = "✅ *NEW SUPPORT CHECK* ✅\n";
+            statusMessage += '--------------------------\n';
+            statusMessage += `📱 *Model:* ${object.model}\n`;
+            statusMessage += `🔒 *Find My iPhone:* ${object.fmiON ? 'ON ✅' : 'OFF ✅'}\n`;
+            statusMessage += `🔒 *Status:* ${object.fmiON ? (object.lostMode ? 'Lost 🔴' : 'Clean ✅') : 'N/A'}\n`;
+            statusMessage += '--------------------------\n';
+
+            client.sendText(message.from, statusMessage);
+          }
+        } catch (error) {
+          console.error('Request error:', error.message);
+          client.sendText(message.from, `❌ *HTTP Error:* ${error.response ? error.response.status : 'Unknown'}\n*Message:* ${error.message}`);
+        }
+      } else {
+        client.sendText(message.from, '⚠️ *Por favor, forneça um IMEI válido.*');
       }
     }
   });
