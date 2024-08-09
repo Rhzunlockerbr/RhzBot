@@ -1,6 +1,8 @@
 const venom = require('venom-bot');
 const axios = require('axios');
 const path = require('path');
+const fs = require('fs');
+const qr = require('qr-image');
 
 venom.create({
   session: 'my-session', // Nome da sessão
@@ -8,7 +10,14 @@ venom.create({
   headless: true, // Deve ser true para rodar sem interface gráfica
   qrTimeout: 0, // Tempo infinito para exibir o QR code
   authTimeout: 60, // Tempo limite para autenticação (em segundos)
-  autoClose: 0 // Não fechar a sessão automaticamente
+  autoClose: 0, // Não fechar a sessão automaticamente
+  catchQR: (qrCode, asciiQR) => {
+    // Salva o QR code como uma imagem PNG
+    const qrPath = path.join(__dirname, 'qrcode.png');
+    qr.image(qrCode, { type: 'png' }).pipe(fs.createWriteStream(qrPath));
+    console.log(`QR Code gerado e salvo em ${qrPath}`);
+    console.log(asciiQR); // Exibe o QR code em ASCII nos logs
+  }
 }).then((client) => start(client));
 
 function start(client) {
