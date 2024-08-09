@@ -3,6 +3,19 @@ const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const qr = require('qr-image');
+const express = require('express');
+
+const app = express();
+
+// Servir o QR code através de uma URL
+app.get('/qrcode', (req, res) => {
+  res.sendFile(path.join(__dirname, 'qrcode.png'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
 
 venom.create({
   session: 'my-session', // Nome da sessão
