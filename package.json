@@ -14,7 +14,7 @@
     "base-64": "^1.0.0",
     "venom-bot": "^5.1.0",
     "qr-image": "^3.2.0",
-    "express": "^4.18.1"  // Adiciona express como dependência
+    "express": "^4.18.1"
   },
   "keywords": []
 }
