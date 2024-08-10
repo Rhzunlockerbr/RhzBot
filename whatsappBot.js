@@ -1,16 +1,9 @@
 const venom = require('venom-bot');
 const axios = require('axios');
 const path = require('path');
-const fs = require('fs');
-const qr = require('qr-image');
 const express = require('express');
 
 const app = express();
-
-// Servir o QR code através de uma URL
-app.get('/qrcode', (req, res) => {
-  res.sendFile(path.join(__dirname, 'qrcode.png'));
-});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -20,16 +13,13 @@ app.listen(PORT, () => {
 venom.create({
   session: 'my-session', // Nome da sessão
   folderNameToken: path.join(__dirname, 'sessions'), // Caminho para armazenar a sessão
-  headless: true, // Deve ser true para rodar sem interface gráfica
+  headless: 'new', // Atualizado para 'new' ou 'false'
   qrTimeout: 0, // Tempo infinito para exibir o QR code
   authTimeout: 60, // Tempo limite para autenticação (em segundos)
   autoClose: 0, // Não fechar a sessão automaticamente
   catchQR: (qrCode, asciiQR) => {
-    // Salva o QR code como uma imagem PNG
-    const qrPath = path.join(__dirname, 'qrcode.png');
-    qr.image(qrCode, { type: 'png' }).pipe(fs.createWriteStream(qrPath));
-    console.log(`QR Code gerado e salvo em ${qrPath}`);
-    console.log(asciiQR); // Exibe o QR code em ASCII nos logs
+    console.log('Por favor, escaneie o QR code abaixo para autenticar:');
+    console.log(asciiQR); // Exibe o QR code em ASCII no terminal
   }
 }).then((client) => start(client));
 
@@ -45,7 +35,6 @@ function start(client) {
       const serial = params[2] ? params[2].trim() : null;
 
       if (imei || serial) {
-        // Mensagem de confirmação
         client.sendText(message.from, '🔍 *Sua consulta está sendo processada.*\nPor favor, aguarde um momento enquanto buscamos as informações...');
 
         const myCheck = {
@@ -62,7 +51,6 @@ function start(client) {
         }
 
         try {
-          // Enviar dados usando URLSearchParams
           const response = await axios.post('https://api.ifreeicloud.co.uk', new URLSearchParams(myCheck).toString(), {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
           });
@@ -121,7 +109,6 @@ function start(client) {
       const imei = params[1] ? params[1].trim() : null;
 
       if (imei) {
-        // Mensagem de confirmação
         client.sendText(message.from, '🔍 *Sua consulta de status está sendo processada.*\nPor favor, aguarde um momento...');
 
         const myCheck = {
@@ -131,7 +118,6 @@ function start(client) {
         };
 
         try {
-          // Enviar dados usando URLSearchParams
           const response = await axios.post('https://api.ifreeicloud.co.uk', new URLSearchParams(myCheck).toString(), {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
           });
