@@ -13,15 +13,22 @@ app.listen(PORT, () => {
 venom.create({
   session: 'my-session', // Nome da sessão
   folderNameToken: path.join(__dirname, 'sessions'), // Caminho para armazenar a sessão
-  headless: 'new', // Atualizado para 'new' ou 'false' para evitar depreciação
+  headless: false, // Alterado para false para permitir ver o navegador
   qrTimeout: 0, // Tempo infinito para exibir o QR code
   authTimeout: 60, // Tempo limite para autenticação (em segundos)
   autoClose: 0, // Não fechar a sessão automaticamente
   catchQR: (qrCode, asciiQR) => {
     console.log('Por favor, escaneie o QR code abaixo para autenticar:');
     console.log(asciiQR); // Exibe o QR code em ASCII no terminal
+  },
+  puppeteerOptions: {
+    executablePath: '/usr/bin/google-chrome-stable', // Garante que o Chrome correto seja usado
+    args: ['--no-sandbox', '--disable-setuid-sandbox'] // Adiciona opções para evitar problemas no ambiente VPS
   }
-}).then((client) => start(client));
+}).then((client) => start(client))
+  .catch((error) => {
+    console.log('Erro ao iniciar o Venom:', error);
+  });
 
 function start(client) {
   console.log('Bot iniciado com sucesso!');
