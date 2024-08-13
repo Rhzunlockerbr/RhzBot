@@ -4,8 +4,8 @@ const path = require('path');
 const express = require('express');
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
-const PORT = process.env.PORT || 3001; // Mudança para a porta 3001
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
@@ -13,7 +13,7 @@ app.listen(PORT, () => {
 venom.create({
   session: 'my-session', // Nome da sessão
   folderNameToken: path.join(__dirname, 'sessions'), // Caminho para armazenar a sessão
-  headless: false, // Alterado para false para permitir ver o navegador
+  headless: false, // Altere para false para visualizar o navegador
   qrTimeout: 0, // Tempo infinito para exibir o QR code
   authTimeout: 60, // Tempo limite para autenticação (em segundos)
   autoClose: 0, // Não fechar a sessão automaticamente
