@@ -4,26 +4,26 @@ const path = require('path');
 const express = require('express');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
+const PORT = process.env.PORT || 3001; // Mudança para a porta 3001
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 venom.create({
-  session: 'my-session',
-  folderNameToken: path.join(__dirname, 'sessions'),
-  headless: false,
-  qrTimeout: 0,
-  authTimeout: 60,
-  autoClose: 0,
+  session: 'my-session', // Nome da sessão
+  folderNameToken: path.join(__dirname, 'sessions'), // Caminho para armazenar a sessão
+  headless: false, // Alterado para false para permitir ver o navegador
+  qrTimeout: 0, // Tempo infinito para exibir o QR code
+  authTimeout: 60, // Tempo limite para autenticação (em segundos)
+  autoClose: 0, // Não fechar a sessão automaticamente
   catchQR: (qrCode, asciiQR) => {
     console.log('Por favor, escaneie o QR code abaixo para autenticar:');
-    console.log(asciiQR);
+    console.log(asciiQR); // Exibe o QR code em ASCII no terminal
   },
   puppeteerOptions: {
-    executablePath: '/usr/bin/google-chrome-stable',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    executablePath: '/usr/bin/google-chrome-stable', // Garante que o Chrome correto seja usado
+    args: ['--no-sandbox', '--disable-setuid-sandbox'] // Adiciona opções para evitar problemas no ambiente VPS
   }
 }).then((client) => start(client))
   .catch((error) => {
