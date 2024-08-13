@@ -22,12 +22,18 @@ venom.create({
     console.log(asciiQR); // Exibe o QR code em ASCII no terminal
   },
   puppeteerOptions: {
-    executablePath: '/usr/bin/google-chrome-stable', // Garante que o Chrome correto seja usado
-    args: ['--no-sandbox', '--disable-setuid-sandbox'] // Adiciona opções para evitar problemas no ambiente VPS
+    executablePath: '/usr/bin/chromium-browser', // Caminho para o Chromium
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-gpu', // Desativa a aceleração de GPU
+      '--disable-dev-shm-usage', // Evita problemas com o espaço de memória compartilhado
+      '--remote-debugging-port=9222' // Habilita a porta de depuração remota
+    ]
   }
 }).then((client) => start(client))
   .catch((error) => {
-    console.log('Erro ao iniciar o Venom:', error);
+    console.error('Erro ao iniciar o Venom:', error);
   });
 
 function start(client) {
